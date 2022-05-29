@@ -4,6 +4,14 @@ Based on [gym-maze](https://github.com/MattChanTK/gym-maze/)
 
 
 added the following:
+
+## New maze design for warehouse
+./gym-maze/envs/maze_samples/maze_warehouse.npy
+
+<kbd>![warehouse design](https://github.com/ghostshield-21/gym-maze/blob/main/pics/warehouse_design.png)</kbd>
+
+
+## Codes for warehouse
 ```
 ----------------------Maze class------------------------
 
@@ -23,8 +31,7 @@ added the following:
   load_pick(self, cell):
   loaded_picks(self):
   get_loaded_picks(self):
-  
-
+ 
 ------------------MazeView2D class--------------------
 **functions:** 
   __draw_picks(self, transparency=160):
