@@ -29,3 +29,6 @@ added the following:
 **functions:** 
   __draw_picks(self, transparency=160):
 ```
+Use **warehouse_test.ipynb** to test the functions step by step. 
+
+Use **warehouse_test.py** to test the overall function. 
