@@ -1,6 +1,6 @@
 # gym-maze
 
-Based on [gym-maze](https://github.com/MattChanTK/gym-maze/tree/master/gym_maze)
+Based on [gym-maze](https://github.com/MattChanTK/gym-maze/)
 
 
 added the following:
