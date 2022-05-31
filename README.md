@@ -11,7 +11,7 @@ added the following:
 <kbd>![warehouse design](https://github.com/ghostshield-21/gym-maze/blob/main/pics/warehouse_design.png)</kbd>
 
 
-## Codes for warehouse
+## Codes adjusted for warehouse simulation
 ```
 ----------------------Maze class------------------------
 
