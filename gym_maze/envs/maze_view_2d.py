@@ -98,7 +98,6 @@ class MazeView2D:
                              % (str(dir), str(self.__maze.COMPASS.keys())))
 
         if self.__maze.is_open(self.__robot, dir):
-
             # update the drawing
             self.__draw_robot(transparency=0)
 

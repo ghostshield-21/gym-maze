@@ -77,9 +77,11 @@ class MazeEnv(gym.Env):
         return [seed]
 
     def step(self, action):
+        action = int(action)
         if isinstance(action, int):
             self.maze_view.move_robot(self.ACTION[action])
         else:
+            print(action)
             self.maze_view.move_robot(action)
 
         if np.array_equal(self.maze_view.robot, self.maze_view.goal):
@@ -111,6 +113,7 @@ class MazeEnv(gym.Env):
             self.maze_view.quit_game()
 
         return self.maze_view.update(mode)
+
 
 
 class MazeWarehouse(MazeEnv):
