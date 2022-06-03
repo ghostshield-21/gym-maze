@@ -84,18 +84,22 @@ class MazeEnv(gym.Env):
             print(action)
             self.maze_view.move_robot(action)
 
-        if np.array_equal(self.maze_view.robot, self.maze_view.goal):
-            reward = 1
-            done = True
-        else:
-            reward = -0.1/(self.maze_size[0]*self.maze_size[1])
-            done = False
+        reward, done = self.calculate_reward_original()
 
         self.state = self.maze_view.robot
 
         info = {}
 
         return self.state, reward, done, info
+
+    def calculate_reward_original(self):
+        if np.array_equal(self.maze_view.robot, self.maze_view.goal):
+            reward = 1
+            done = True
+        else:
+            reward = -0.1/(self.maze_size[0]*self.maze_size[1])
+            done = False
+        return reward, done
 
     def reset(self):
         self.maze_view.reset_robot()
@@ -113,8 +117,6 @@ class MazeEnv(gym.Env):
             self.maze_view.quit_game()
 
         return self.maze_view.update(mode)
-
-
 
 class MazeWarehouse(MazeEnv):
 
