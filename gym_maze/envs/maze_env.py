@@ -5,6 +5,18 @@ import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
 from gym_maze.envs.maze_view_2d import MazeView2D
+import gym_maze.envs.maze_reward as maze_reward
+
+"""
+Warehouse Version v0.1
+   changed observation state and state of the warehouse to included
+        payloads
+        robot
+        goal
+
+    added a simple reward based on the the new state structure 
+
+"""
 
 
 class MazeEnv(gym.Env):
@@ -15,8 +27,9 @@ class MazeEnv(gym.Env):
     ACTION = ["N", "S", "E", "W"]
 
     def __init__(self, maze_file=None, maze_size=None, mode=None, enable_render=True):
-
+        print('version v0.1 warehouse')
         self.viewer = None
+        self.done=False
         self.enable_render = enable_render
         
         if mode=="pick":
@@ -50,12 +63,12 @@ class MazeEnv(gym.Env):
         self.action_space = spaces.Discrete(2*len(self.maze_size))
 
         # observation is the x, y coordinate of the grid
-        low = np.zeros(len(self.maze_size), dtype=int)
-        high =  np.array(self.maze_size, dtype=int) - np.ones(len(self.maze_size), dtype=int)
+        low = np.zeros( self.maze_size, dtype=int)
+        high =  np.full( self.maze_size, 3) 
         self.observation_space = spaces.Box(low, high, dtype=np.int64)
 
         # initial condition
-        self.state = None
+        self.state = np.zeros( self.maze_size, dtype=int)
         self.steps_beyond_done = None
 
         # Simulation related variables.
@@ -84,27 +97,46 @@ class MazeEnv(gym.Env):
             print(action)
             self.maze_view.move_robot(action)
 
-        reward, done = self.calculate_reward_original()
+        reward, done = self.calculate_reward_xy_1()
 
-        self.state = self.maze_view.robot
-
+        self.calculate_state()
+        
         info = {}
 
         return self.state, reward, done, info
 
-    def calculate_reward_original(self):
-        if np.array_equal(self.maze_view.robot, self.maze_view.goal):
+    def calculate_reward_xy_1(self):
+
+        if self.maze_view.maze.is_pick( tuple(self.maze_view.robot) ):
+            self.maze_view.maze.load_pick( tuple(self.maze_view.robot) )
+            reward = 1 / self.maze_view.maze.num_picks
+            done = False
+
+        elif np.array_equal(self.maze_view.robot, self.maze_view.goal):
             reward = 1
             done = True
+            print("******************compeleted******************")
+            print("loaded packages: ", self.maze_view.maze.get_loaded_picks())
+
         else:
             reward = -0.1/(self.maze_size[0]*self.maze_size[1])
             done = False
+
         return reward, done
 
+
+    def calculate_state(self):
+
+        self.state = np.zeros( self.maze_size, dtype=int)
+        self.state[self.maze_view.robot[0], self.maze_view.robot[1]] = 1
+        self.state[self.maze_view.goal[0], self.maze_view.goal[1]] = 3
+
+        for pick_corrd in self.maze_view.maze.get_picks_all():
+            self.state[pick_corrd[0], pick_corrd[1]] = 2
+        
     def reset(self):
         self.maze_view.reset_robot()
-        #self.maze_view.maze.reset_picks()
-        self.state = np.zeros(2)
+        self.calculate_state()
         self.steps_beyond_done = None
         self.done = False
         return self.state

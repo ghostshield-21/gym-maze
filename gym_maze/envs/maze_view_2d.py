@@ -109,8 +109,8 @@ class MazeView2D:
                 self.__robot = np.array(self.maze.get_portal(tuple(self.robot)).teleport(tuple(self.robot)))
 
             # if it's in a pick area afterwards
-            if self.maze.is_pick( tuple(self.robot) ):
-                self.maze.load_pick( tuple(self.robot) )
+            #if self.maze.is_pick( tuple(self.robot) ):
+            #    self.maze.load_pick( tuple(self.robot) )
             self.__draw_robot(transparency=255)
 
 
@@ -570,7 +570,7 @@ class Maze:
         return (cell in self.__picks)
 
     def get_pick(self, cell):
-        if cell in self.__picks:
+        if (cell in self.__picks):
             return cell
         return None
 
