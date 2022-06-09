@@ -326,7 +326,7 @@ class Maze:
         self.__portals = []
         self.num_portals = num_portals
 
-        
+        self.__original_picks= []
         self.__picks = []
         self.__loaded_picks = []
         self.num_picks = num_picks
@@ -424,7 +424,7 @@ class Maze:
             self.__set_random_portals(num_portal_sets=self.num_portals, set_size=2)
 
         if self.num_picks > 0:
-            self.__set_random_picks(self.num_picks)
+            self.__set_random_picks()
 
     def _generate_preset_maze(self):
 
@@ -432,8 +432,7 @@ class Maze:
             self.__set_random_portals(num_portal_sets=self.num_portals, set_size=2)
 
         if self.num_picks > 0:
-            #self.__set_random_picks(self.num_picks)
-            #print('test self.num_picks = ', self.num_picks )
+            self.__set_random_picks()
             pass
 
     def __break_random_walls(self, percent):
@@ -519,12 +518,19 @@ class Maze:
                 self.__picks=[]
                 self.__loaded_picks=[]
                 pick_locations = random.sample( pick_coords_all, num_picks)
-                self.__picks = pick_locations.copy()
+                self.__original_picks = pick_locations.copy()
+                self.__picks = self.__original_picks.copy()
             else:
                 pass
 
     def reset_picks(self):
-        self.__set_random_picks()
+        #if len(self.__original_picks) == self.num_picks:
+        #    self.__picks = self.__original_picks.copy()
+        #    self.__loaded_picks = []
+        #else:
+            self.__set_random_picks()
+            self.__loaded_picks = []
+
 
     def is_open(self, cell_id, dir):
         # check if it would be out-of-bound

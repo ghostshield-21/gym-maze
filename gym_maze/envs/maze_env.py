@@ -8,12 +8,11 @@ from gym_maze.envs.maze_view_2d import MazeView2D
 import gym_maze.envs.maze_reward as maze_reward
 
 """
-Warehouse Version v0.2
-    moved all rewards to maze_reward.py
-    added a few trial reward fucntion
-
+Warehouse Version v0.3
+    added some comments
+    updated some reward functions
+    updated some testing parameters
 """
-
 
 class MazeEnv(gym.Env):
     metadata = {
@@ -58,7 +57,8 @@ class MazeEnv(gym.Env):
         # forward or backward in each dimension
         self.action_space = spaces.Discrete(2*len(self.maze_size))
 
-        # observation is the x, y coordinate of the grid
+        # observation is the numeric representation of all warehouse state
+        # -1 for unavailable path        # 0 for path        # 1 for robot        # 2 for packages        # 3 for delivery area
         low = np.full( self.maze_size, -1)
         high =  np.full( self.maze_size, 3) 
         self.observation_space = spaces.Box(low, high, dtype=np.int64)
@@ -93,46 +93,61 @@ class MazeEnv(gym.Env):
             print(action)
             self.maze_view.move_robot(action)
 
+        # calls reward functions from maze_reward.py
         reward, done = maze_reward.calculate_reward_xy_latest(self)
 
+        # calls state update function
         self.update_state()
         
         info = {}
-
+        
         self.prev_robot = self.maze_view.robot.copy()
 
         return self.state, reward, done, info
 
 
     def update_state(self):
+        # function to update state
 
+        # update in state location to 2 of all the un-loaded packages
         for pick_corrd in self.maze_view.maze.get_picks_all():
             self.state[pick_corrd[0], pick_corrd[1]] = 2
 
+        # update in state location to zero of all the loaded packages
         for load_corrd in self.maze_view.maze.get_loaded_picks():
             self.state[load_corrd[0], load_corrd[1]] = 0
-        
+
+        # update in state location for the robot
         self.state[self.prev_robot[0], self.prev_robot[1]] = 0
         self.state[self.maze_view.robot[0], self.maze_view.robot[1]] = 1
-        self.state[self.maze_view.goal[0], self.maze_view.goal[1]] = 3
         
 
     def reset_state(self):
         
+        # initialize state location too all zero value
         self.state = np.zeros( self.maze_size, dtype=int)
+
+        # initialize the state location to -1 for unavailable path (based on Maze cell = 0)
         zeros = np.where(self.maze_view.maze.maze_cells == 0)
         ZeroCoordinates= list(zip(zeros[0], zeros[1]))
         for zero_corrd in ZeroCoordinates:
-            self.state[zero_corrd[0], zero_corrd[1]] =-1 
+            self.state[zero_corrd[0], zero_corrd[1]] =-1
+        
+        # initialize the state location to 3 for goal
+        self.state[self.maze_view.goal[0], self.maze_view.goal[1]] = 3
+
 
     def reset(self):
+        # reset the robot location
         self.maze_view.reset_robot()
+        # reset the previous robot location
         self.prev_robot = self.maze_view.robot.copy()
-        print('Robots Reseted')
 
+        # reset the state
         self.reset_state()
+        # update the state
         self.update_state()
-        print('State Reseted')
+        print('Env Reseted')
 
         self.steps_beyond_done = None
         self.done = False
